@@ -28,12 +28,12 @@ resource "kubernetes_secret_v1" "petclinic_rds" {
   type = "Opaque"
 
   data = {
-  POSTGRES_URL = "jdbc:postgresql://${module.aws_vpc.rds_endpoint}:${module.aws_vpc.rds_port}/${module.aws_vpc.rds_database_name}"
+    POSTGRES_URL = "jdbc:postgresql://${module.aws_vpc.rds_endpoint}:${module.aws_vpc.rds_port}/${module.aws_vpc.rds_database_name}"
 
-  POSTGRES_USER = local.rds_credentials.username
+    POSTGRES_USER = local.rds_credentials.username
 
-  POSTGRES_PASS = local.rds_credentials.password
-}
+    POSTGRES_PASS = local.rds_credentials.password
+  }
 
   depends_on = [
     module.aws_vpc
