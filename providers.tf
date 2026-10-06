@@ -21,6 +21,13 @@ terraform {
       version = "~> 3.0"
     }
   }
+    backend "s3" {
+      bucket         = "terraform-bucket-mumbai"
+      key            = "envs/dev/terraform.tfstate"
+      region         = "ca-central-1"
+      encrypt        = true
+  
+  }
 }
 
 provider "aws" {

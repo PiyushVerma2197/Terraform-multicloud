@@ -5,7 +5,7 @@ provider "aws" {
 resource "aws_s3_bucket" "tf_state" {
   bucket = var.aws_s3_bucket
 
-   lifecycle {
+  lifecycle {
     prevent_destroy = true
   }
 
