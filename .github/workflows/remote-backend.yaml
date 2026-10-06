@@ -1,0 +1,57 @@
+name: Create Terraform Remote Backend
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ap-south-1
+
+jobs:
+  remote-backend:
+    name: Create Remote Backend
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: remote-backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify AWS identity
+        run: |
+          aws sts get-caller-identity
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: |
+          terraform init
+
+      - name: Terraform Format Check
+        run: |
+          terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: |
+          terraform validate
+
+      - name: Terraform Plan
+        run: |
+          terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        run: |
+          terraform apply -auto-approve tfplan
