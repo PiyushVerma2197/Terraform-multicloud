@@ -46,9 +46,24 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Select dev workspace
+      - name: Select or create Terraform workspace
         run: |
-          terraform workspace select dev || terraform workspace new dev
+         WORKSPACE="dev"
+
+         if terraform workspace list | grep -E "^[* ]+$WORKSPACE$" > /dev/null; then
+           echo "Workspace '$WORKSPACE' already exists. Selecting it..."
+           terraform workspace select "$WORKSPACE"
+         else
+           echo "Workspace '$WORKSPACE' does not exist. Creating it..."
+           terraform workspace new "$WORKSPACE"
+         fi
+
+         echo "Current workspace:"
+         terraform workspace show
+
+  #    - name: Select dev workspace
+  #      run: |
+  #        terraform workspace select dev || terraform workspace new dev
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
