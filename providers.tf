@@ -21,12 +21,12 @@ terraform {
       version = "~> 3.0"
     }
   }
-    backend "s3" {
-      bucket         = "terraform-bucket-mumbai-12"
-      key            = "envs/dev/terraform.tfstate"
-      region         = "ap-south-1"
-      encrypt        = true
-  
+  backend "s3" {
+    bucket  = "terraform-bucket-mumbai-12"
+    key     = "envs/dev/terraform.tfstate"
+    region  = "ap-south-1"
+    encrypt = true
+
   }
 }
 
