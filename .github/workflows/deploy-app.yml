@@ -1,0 +1,73 @@
+name: Deploy PetClinic
+
+on:
+  workflow_run:
+    workflows:
+      - Terraform Infrastructure
+    types:
+      - completed
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ap-south-1
+
+jobs:
+  deploy:
+    name: Deploy to EKS
+    runs-on: ubuntu-latest
+
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+            --region "$AWS_REGION" \
+            --name "$(terraform output -raw eks_cluster_name)"
+
+      - name: Verify cluster
+        run: |
+          kubectl get nodes
+          kubectl get pods -A
+
+      - name: Install/Update NGINX Ingress
+        run: |
+          helm upgrade --install ingress-nginx \
+            ingress-nginx/ingress-nginx \
+            --repo https://kubernetes.github.io/ingress-nginx \
+            --namespace ingress-nginx \
+            --create-namespace \
+            --set controller.service.type=NodePort \
+            --set controller.service.nodePorts.http=32652
+
+      - name: Apply PetClinic
+        run: |
+          kubectl apply -f spring-petclinic/k8s/petclinic.yml
+
+      - name: Wait for PetClinic
+        run: |
+          kubectl rollout status \
+            deployment/petclinic \
+            --timeout=300s
+
+      - name: Verify PetClinic
+        run: |
+          kubectl get pods
+          kubectl get svc
+          kubectl get ingress
