@@ -24,7 +24,7 @@ terraform {
     backend "s3" {
       bucket         = "terraform-bucket-mumbai"
       key            = "envs/dev/terraform.tfstate"
-      region         = "ca-central-1"
+      region         = "ap-south-1"
       encrypt        = true
   
   }
