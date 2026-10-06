@@ -1,13 +1,22 @@
 name: Terraform Infrastructure
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
     
-  pull_request:
-    branches:
-      - main
+#   pull_request:
+#     branches:
+#       - main
+
+on:
+  workflow_run:
+    workflows:
+      - Create Terraform Remote Backend
+    types:
+      - completed
+
+  workflow_dispatch:
    
 permissions:
   contents: read
