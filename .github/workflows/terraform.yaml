@@ -8,7 +8,7 @@ on:
       - '**.tf'
       - '**.tfvars'
       - '.terraform.lock.hcl'
-      - '.github/workflows/terraform.yml'
+      - '.github/workflows/terraform.yaml'
 
   pull_request:
     branches:
