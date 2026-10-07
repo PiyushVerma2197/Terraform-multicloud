@@ -120,8 +120,9 @@ jobs:
 
       - name: Apply PetClinic
         run: |
-          kubectl apply -f spring-petclinic/k8s/petclinic.yml
-
+          kubectl apply -f spring-petclinic/k8s/petclinic.yml 
+          kubectl apply -f spring-petclinic/k8s/generated-ingress.yaml
+          
       - name: Wait for PetClinic
         run: |
           kubectl rollout status \
