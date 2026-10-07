@@ -10,6 +10,11 @@ output "aws_vpc_cidr" {
   value = module.aws_vpc.vpc_cidr
 }
 
+output "eks_cluster_name" {
+  description = "EKS cluster name"
+  value       = module.aws_vpc.eks_cluster_name
+}
+
 output "azure_resource_group" {
   value = module.azure_vnet.resource_group_name
 }
