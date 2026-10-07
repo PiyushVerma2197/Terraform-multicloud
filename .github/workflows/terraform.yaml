@@ -71,15 +71,50 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      # - name: Terraform Plan
+      #   run: |
+      #     terraform plan \
+      #       -target=module.aws_vpc \
+      #       -target=helm_release.nginx_ingress \
+      #       -target=kubernetes_secret_v1.petclinic_rds \
+      #       -target=kubernetes_deployment_v1.ingress_healthcheck \
+      #       -target=kubernetes_service_v1.ingress_healthcheck \
+      #       -out=tfplan
+
       - name: Terraform Plan
+        shell: bash
         run: |
+          set -o pipefail
+
+          echo "========================================"
+          echo "Starting Terraform Plan"
+          echo "========================================"
+
+          terraform version
+          terraform workspace show
+          terraform state list || true
+
+          echo "========================================"
+          echo "Running Terraform Plan"
+          echo "========================================"
+
           terraform plan \
-            -target=module.aws_vpc \
-            -target=helm_release.nginx_ingress \
-            -target=kubernetes_secret_v1.petclinic_rds \
-            -target=kubernetes_deployment_v1.ingress_healthcheck \
-            -target=kubernetes_service_v1.ingress_healthcheck \
-            -out=tfplan
+          -target=module.aws_vpc \
+          -target=helm_release.nginx_ingress \
+          -target=kubernetes_secret_v1.petclinic_rds \
+          -target=kubernetes_deployment_v1.ingress_healthcheck \
+          -target=kubernetes_service_v1.ingress_healthcheck \
+          -out=tfplan \
+          -no-color \
+           2>&1 | tee terraform-plan.log
+
+          PLAN_EXIT_CODE=${PIPESTATUS[0]}
+
+          echo "========================================"
+          echo "Terraform Plan Exit Code: $PLAN_EXIT_CODE"
+          echo "========================================"
+
+          exit $PLAN_EXIT_CODE
 
       - name: Verify Terraform Plan
         run: |
