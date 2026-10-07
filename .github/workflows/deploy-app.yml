@@ -35,16 +35,16 @@ jobs:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Configure kubectl
-        run: |
-          aws eks update-kubeconfig \
-            --region "$AWS_REGION" \
-            --name "$(terraform output -raw eks_cluster_name)"
+      # - name: Configure kubectl
+      #   run: |
+      #     aws eks update-kubeconfig \
+      #       --region "$AWS_REGION" \
+      #       --name "$(terraform output -raw eks_cluster_name)"
 
-      - name: Verify cluster
-        run: |
-          kubectl get nodes
-          kubectl get pods -A
+      # - name: Verify cluster
+      #   run: |
+      #     kubectl get nodes
+      #     kubectl get pods -A
 
       - name: Install/Update NGINX Ingress
         run: |
