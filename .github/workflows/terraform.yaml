@@ -61,60 +61,17 @@ jobs:
          echo "Current workspace:"
          terraform workspace show
 
-  #    - name: Select dev workspace
-  #      run: |
-  #        terraform workspace select dev || terraform workspace new dev
-
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
 
       - name: Terraform Validate
         run: terraform validate
 
-      # - name: Terraform Plan
-      #   run: |
-      #     terraform plan \
-      #       -target=module.aws_vpc \
-      #       -target=helm_release.nginx_ingress \
-      #       -target=kubernetes_secret_v1.petclinic_rds \
-      #       -target=kubernetes_deployment_v1.ingress_healthcheck \
-      #       -target=kubernetes_service_v1.ingress_healthcheck \
-      #       -out=tfplan
-
       - name: Terraform Plan
-        shell: bash
         run: |
-          set -o pipefail
-
-          echo "========================================"
-          echo "Starting Terraform Plan"
-          echo "========================================"
-
-          terraform version
-          terraform workspace show
-          terraform state list || true
-
-          echo "========================================"
-          echo "Running Terraform Plan"
-          echo "========================================"
-
           terraform plan \
-          -target=module.aws_vpc \
-          -target=helm_release.nginx_ingress \
-          -target=kubernetes_secret_v1.petclinic_rds \
-          -target=kubernetes_deployment_v1.ingress_healthcheck \
-          -target=kubernetes_service_v1.ingress_healthcheck \
-          -out=tfplan \
-          -no-color \
-           2>&1 | tee terraform-plan.log
-
-          PLAN_EXIT_CODE=${PIPESTATUS[0]}
-
-          echo "========================================"
-          echo "Terraform Plan Exit Code: $PLAN_EXIT_CODE"
-          echo "========================================"
-
-          exit $PLAN_EXIT_CODE
+            -target=module.aws_vpc \
+            -out=tfplan
 
       - name: Verify Terraform Plan
         run: |
@@ -122,4 +79,34 @@ jobs:
 
       - name: Terraform Apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -target=module.aws_vpc -auto-approve tfplan
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+            --region "$AWS_REGION" \
+            --name "$(terraform output -raw eks_cluster_name)"
+
+      - name: Verify cluster
+        run: |
+          kubectl get nodes
+          kubectl get pods -A
+
+      - name: Terraform Plan
+        run: |
+           terraform plan \
+           -target=helm_release.nginx_ingress \
+           -target=kubernetes_secret_v1.petclinic_rds \
+           -target=kubernetes_deployment_v1.ingress_healthcheck \
+           -target=kubernetes_service_v1.ingress_healthcheck \
+           -out=k8s.tfplan
+
+      - name: Terraform Apply for Kuberenetes Resources
+        run: |
+           terraform apply \
+           -target=helm_release.nginx_ingress \
+           -target=kubernetes_secret_v1.petclinic_rds \
+           -target=kubernetes_deployment_v1.ingress_healthcheck \
+           -target=kubernetes_service_v1.ingress_healthcheck \
+           -out=k8s.tfplan
+         
