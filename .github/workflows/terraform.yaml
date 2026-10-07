@@ -85,7 +85,7 @@ jobs:
         run: |
           aws eks update-kubeconfig \
             --region "$AWS_REGION" \
-            --name "$(terraform output -raw aws_eks_cluster)"
+            --name "$(terraform output -raw eks_cluster_name)"
 
       - name: Verify cluster
         run: |
