@@ -23,7 +23,7 @@ terraform {
   }
   backend "s3" {
     bucket  = "terraform-bucket-mumbai-12"
-    key     = "envs/dev/terraform.tfstate"
+    key     = "terraform.tfstate"
     region  = "ap-south-1"
     encrypt = true
 
