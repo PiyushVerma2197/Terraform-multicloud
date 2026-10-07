@@ -107,6 +107,6 @@ jobs:
            -target=helm_release.nginx_ingress \
            -target=kubernetes_secret_v1.petclinic_rds \
            -target=kubernetes_deployment_v1.ingress_healthcheck \
-           -target=kubernetes_service_v1.ingress_healthcheck \
-           -out=k8s.tfplan
+           -target=kubernetes_service_v1.ingress_healthcheck -auto-approve k8s.tfplan
+           
          
