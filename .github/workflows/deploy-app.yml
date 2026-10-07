@@ -46,6 +46,44 @@ jobs:
       #     kubectl get nodes
       #     kubectl get pods -A
 
+
+      - name: Configure kubectl for EKS
+        shell: bash
+        run: |
+         set -e
+
+         echo "AWS Region: $AWS_REGION"
+
+         echo "Available EKS clusters:"
+         aws eks list-clusters \
+         --region "$AWS_REGION"
+
+         CLUSTER_NAME=$(aws eks list-clusters \
+         --region "$AWS_REGION" \
+         --query 'clusters[0]' \
+         --output text)
+
+         echo "Cluster name: $CLUSTER_NAME"
+
+         if [ -z "$CLUSTER_NAME" ] || [ "$CLUSTER_NAME" = "None" ]; then
+          echo "ERROR: EKS cluster was not found."
+          exit 1
+         fi
+
+         echo "Updating kubeconfig..."
+
+         aws eks update-kubeconfig \
+         --region "$AWS_REGION" \
+         --name "$CLUSTER_NAME"
+         
+         echo "Kubeconfig created successfully."
+         
+         echo "Current kubeconfig:"
+         
+         kubectl config view --minify
+         echo "Current context:"
+         kubectl config current-context
+
       - name: Verify EKS connection
         shell: bash
         run: |
