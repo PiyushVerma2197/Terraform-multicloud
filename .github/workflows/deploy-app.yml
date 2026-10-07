@@ -41,10 +41,10 @@ jobs:
       #       --region "$AWS_REGION" \
       #       --name "$(terraform output -raw eks_cluster_name)"
 
-      # - name: Verify cluster
-      #   run: |
-      #     kubectl get nodes
-      #     kubectl get pods -A
+      - name: Verify cluster
+        run: |
+          kubectl get nodes
+          kubectl get pods -A
 
       - name: Install/Update NGINX Ingress
         run: |
