@@ -89,7 +89,7 @@ resource "helm_release" "argocd" {
 
 resource "kubernetes_manifest" "petclinic_argocd_application" {
   manifest = yamldecode(
-    file("${path.module}/argocd/petclinic-app.yaml")
+    file("${path.module}/argocd/petclinic-app-thrg-argocd.yaml")
   )
 
   depends_on = [
