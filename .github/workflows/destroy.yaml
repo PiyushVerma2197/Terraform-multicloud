@@ -96,6 +96,7 @@ jobs:
       - name: Terraform Destroy Plan
         run: |
           terraform plan \
+            -target=module.aws_vpc \
             -destroy \
             -out=destroy.tfplan
 
