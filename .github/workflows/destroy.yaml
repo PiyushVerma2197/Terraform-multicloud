@@ -112,7 +112,7 @@ jobs:
       - name: Terraform Destroy
         run: |
           terraform destroy -target=module.aws_vpc \
-            -auto-approve \
+            -auto-approve 
              
 
       # --------------------------------------------------
