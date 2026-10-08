@@ -38,3 +38,51 @@ resource "helm_release" "nginx_ingress" {
     }
   ]
 }
+
+
+# =========================================================
+# ARGO CD
+# =========================================================
+
+resource "helm_release" "argocd" {
+  name             = "argocd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  namespace        = "argocd"
+  create_namespace = true
+
+  values = [
+    yamlencode({
+      configs = {
+        params = {
+          "server.insecure" = true
+        }
+      }
+
+      server = {
+        service = {
+          type = "ClusterIP"
+        }
+
+        ingress = {
+          enabled          = true
+          ingressClassName = "nginx"
+
+          hosts = [
+            {
+              host = "argocd.doingfun.shop"
+            }
+          ]
+
+          annotations = {
+            "nginx.ingress.kubernetes.io/backend-protocol" = "HTTP"
+          }
+        }
+      }
+    })
+  ]
+
+  depends_on = [
+    helm_release.nginx_ingress
+  ]
+}
