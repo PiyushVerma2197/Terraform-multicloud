@@ -90,24 +90,30 @@ jobs:
           echo "Resources currently managed by Terraform:"
           terraform state list
 
-      # --------------------------------------------------
-      # Create destroy plan
-      # --------------------------------------------------
-      - name: Terraform Destroy Plan
-        run: |
-          terraform plan \
-            -target=module.aws_vpc \
-            -destroy \
-            -out=destroy.tfplan
+      # # --------------------------------------------------
+      # # Create destroy plan
+      # # --------------------------------------------------
+      # - name: Terraform Destroy Plan
+      #   run: |
+      #     terraform plan \
+      #       -target=module.aws_vpc \
+      #       -destroy \
+      #       -out=destroy.tfplan
 
-      # --------------------------------------------------
-      # Destroy infrastructure
-      # --------------------------------------------------
+      # # --------------------------------------------------
+      # # Destroy infrastructure
+      # # --------------------------------------------------
+      # - name: Terraform Destroy
+      #   run: |
+      #     terraform apply \
+      #       -auto-approve \
+      #        destroy.tfplan
+
       - name: Terraform Destroy
         run: |
-          terraform apply \
+          terraform destroy \
             -auto-approve \
-            destroy.tfplan
+             
 
       # --------------------------------------------------
       # Verify remaining state
