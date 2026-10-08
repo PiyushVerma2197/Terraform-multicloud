@@ -101,36 +101,26 @@ jobs:
       # - name: Install/Update NGINX Ingress
       #   run: |
       #     helm upgrade --install ingress-nginx \
-      #       ingress-nginx/ingress-nginx \
-      #       --repo https://kubernetes.github.io/ingress-nginx \
-      #       --namespace ingress-nginx \
-      #       --create-namespace \
-      #       --set controller.service.type=NodePort \
-      #       --set controller.service.nodePorts.http=32652
+      #      ingress-nginx \
+      #      --repo https://kubernetes.github.io/ingress-nginx \
+      #      --namespace ingress-nginx \
+      #      --create-namespace \
+      #      --set controller.service.type=NodePort \
+      #      --set controller.service.nodePorts.http=32652
 
-      - name: Install/Update NGINX Ingress
-        run: |
-          helm upgrade --install ingress-nginx \
-           ingress-nginx \
-           --repo https://kubernetes.github.io/ingress-nginx \
-           --namespace ingress-nginx \
-           --create-namespace \
-           --set controller.service.type=NodePort \
-           --set controller.service.nodePorts.http=32652
-
-      - name: Apply PetClinic
-        run: |
-          kubectl apply -f spring-petclinic/k8s/petclinic.yml 
-          kubectl apply -f spring-petclinic/k8s/generated-ingress.yaml
+      # - name: Apply PetClinic
+      #   run: |
+      #     kubectl apply -f spring-petclinic/k8s/petclinic.yml 
+      #     kubectl apply -f spring-petclinic/k8s/generated-ingress.yaml
           
-      - name: Wait for PetClinic
-        run: |
-          kubectl rollout status \
-            deployment/petclinic \
-            --timeout=300s
+      # - name: Wait for PetClinic
+      #   run: |
+      #     kubectl rollout status \
+      #       deployment/petclinic \
+      #       --timeout=300s
 
-      - name: Verify PetClinic
-        run: |
-          kubectl get pods
-          kubectl get svc
-          kubectl get ingress
+      # - name: Verify PetClinic
+      #   run: |
+      #     kubectl get pods
+      #     kubectl get svc
+      #     kubectl get ingress
