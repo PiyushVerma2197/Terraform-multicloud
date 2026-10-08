@@ -86,3 +86,13 @@ resource "helm_release" "argocd" {
     helm_release.nginx_ingress
   ]
 }
+
+resource "kubernetes_manifest" "petclinic_argocd_application" {
+  manifest = yamldecode(
+    file("${path.module}/argocd/petclinic-app.yaml")
+  )
+
+  depends_on = [
+    helm_release.argocd
+  ]
+}
