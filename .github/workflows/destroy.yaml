@@ -1,0 +1,120 @@
+name: Destroy Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Terraform environment to destroy"
+        required: true
+        type: choice
+        options:
+          - dev
+          - uat
+          - prod
+        default: dev
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ap-south-1
+
+jobs:
+  destroy:
+    name: Destroy ${{ inputs.environment }} Infrastructure
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # --------------------------------------------------
+      # Checkout repository
+      # --------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # --------------------------------------------------
+      # Configure AWS credentials using GitHub OIDC
+      # --------------------------------------------------
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # --------------------------------------------------
+      # Verify AWS identity
+      # --------------------------------------------------
+      - name: Verify AWS identity
+        run: |
+          aws sts get-caller-identity
+
+      # --------------------------------------------------
+      # Setup Terraform
+      # --------------------------------------------------
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # --------------------------------------------------
+      # Initialize Terraform
+      # --------------------------------------------------
+      - name: Terraform Init
+        run: |
+          terraform init
+
+      # --------------------------------------------------
+      # Select Terraform workspace
+      # --------------------------------------------------
+      - name: Select Terraform workspace
+        run: |
+          WORKSPACE="${{ inputs.environment }}"
+
+          if terraform workspace list | sed 's/^[* ]*//' | grep -qx "$WORKSPACE"; then
+            echo "Selecting existing workspace: $WORKSPACE"
+            terraform workspace select "$WORKSPACE"
+          else
+            echo "ERROR: Terraform workspace '$WORKSPACE' does not exist."
+            echo "Available workspaces:"
+            terraform workspace list
+            exit 1
+          fi
+
+          echo "Current workspace:"
+          terraform workspace show
+
+      # --------------------------------------------------
+      # Show resources before destruction
+      # --------------------------------------------------
+      - name: Show Terraform state
+        run: |
+          echo "Resources currently managed by Terraform:"
+          terraform state list
+
+      # --------------------------------------------------
+      # Create destroy plan
+      # --------------------------------------------------
+      - name: Terraform Destroy Plan
+        run: |
+          terraform plan \
+            -destroy \
+            -out=destroy.tfplan
+
+      # --------------------------------------------------
+      # Destroy infrastructure
+      # --------------------------------------------------
+      - name: Terraform Destroy
+        run: |
+          terraform apply \
+            -auto-approve \
+            destroy.tfplan
+
+      # --------------------------------------------------
+      # Verify remaining state
+      # --------------------------------------------------
+      - name: Verify Terraform state
+        run: |
+          echo "Remaining Terraform resources:"
+          terraform state list || true
+
+          echo "Current workspace:"
+          terraform workspace show
