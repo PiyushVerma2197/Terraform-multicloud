@@ -154,7 +154,7 @@ locals {
   }
 
   eks_node_desired_sizes = {
-    dev   = 1
+    dev   = 2
     stage = 2
     prod  = 3
   }
