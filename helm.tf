@@ -53,6 +53,9 @@ resource "helm_release" "argocd" {
 
   values = [
     yamlencode({
+      global = {
+        domain = "argocd.doingfun.shop"
+      }
       configs = {
         params = {
           "server.insecure" = true
