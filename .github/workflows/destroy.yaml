@@ -151,16 +151,8 @@ jobs:
       # --------------------------------------------------
       - name: Destroy Remaining Infrastructure
         run: |
-          terraform destroy -auto-approve
+          terraform destroy -target=module.aws_vpc -auto-approve
 
-      # --------------------------------------------------
-      # Verify remaining state
-      # --------------------------------------------------
-      - name: Verify Terraform State
-        run: |
-          terraform state list || true
-          terraform workspace show
-       
 
       # --------------------------------------------------
       # Verify remaining state
