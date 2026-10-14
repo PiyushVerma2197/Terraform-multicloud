@@ -113,6 +113,11 @@ jobs:
           kubectl apply -f spring-petclinic/k8s/petclinic.yml 
           kubectl apply -f spring-petclinic/k8s/generated-ingress.yaml
 
+      - name: Apply ArgoCD
+        run: |
+          kubectl apply -f argocd/petclinic-app-thrg-argocd.yaml
+              
+
       # - name: Apply PetClinic
       #   run: |
       #     kubectl apply -f spring-petclinic/k8s/generated-ingress.yaml    
