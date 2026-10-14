@@ -73,6 +73,12 @@ variable "subdomain" {
   default     = "petclinic"
 }
 
+variable "subdomain1" {
+  description = "Application subdomain"
+  type        = string
+  default     = "argocd"
+}
+
 variable "alb_dns_name" {
   description = "Existing ALB DNS name"
   type        = string
