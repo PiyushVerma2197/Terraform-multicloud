@@ -20,7 +20,7 @@ resource "aws_route53_record" "petclinic" {
   }
 }
 
-resource "aws_route53_record" "petclinic" {
+resource "aws_route53_record" "argocd" {
   zone_id = aws_route53_zone.main.zone_id
 
   name = "${var.subdomain1}.${var.domain_name}"
