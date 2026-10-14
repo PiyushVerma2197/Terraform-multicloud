@@ -90,30 +90,77 @@ jobs:
           echo "Resources currently managed by Terraform:"
           terraform state list
 
-      # --------------------------------------------------
-      # Create destroy plan
-      # --------------------------------------------------
-      - name: Terraform Destroy Plan
-        run: |
-          terraform plan \
-            -target=module.aws_vpc \
-            -destroy \
-            -out=destroy.tfplan
+      # # --------------------------------------------------
+      # # Create destroy plan
+      # # --------------------------------------------------
+      # - name: Terraform Destroy Plan
+      #   run: |
+      #     terraform plan \
+      #       -target=module.aws_vpc \
+      #       -destroy \
+      #       -out=destroy.tfplan
 
-      # --------------------------------------------------
-      # Destroy infrastructure
-      # --------------------------------------------------
-      - name: Terraform Destroy
-        run: |
-          terraform apply \
-            -auto-approve \
-             destroy.tfplan
-
+      # # --------------------------------------------------
+      # # Destroy infrastructure
+      # # --------------------------------------------------
       # - name: Terraform Destroy
       #   run: |
-      #     terraform destroy -target=module.aws_vpc \
-      #       -auto-approve 
-             
+      #     terraform apply \
+      #       -auto-approve \
+      #        destroy.tfplan
+
+      # # - name: Terraform Destroy
+      # #   run: |
+      # #     terraform destroy -target=module.aws_vpc \
+      # #       -auto-approve 
+
+
+      
+      # --------------------------------------------------
+      # Configure kubectl while EKS is still running
+      # --------------------------------------------------
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+            --region "$AWS_REGION" \
+            --name "$(terraform output -raw eks_cluster_name)"
+
+      # --------------------------------------------------
+      # Verify EKS access
+      # --------------------------------------------------
+      - name: Verify EKS access
+        run: |
+          kubectl get nodes
+          kubectl get pods -A
+
+      # --------------------------------------------------
+      # Destroy Kubernetes and Helm resources first
+      # --------------------------------------------------
+      - name: Destroy Kubernetes Resources
+        run: |
+          terraform destroy \
+            -target=helm_release.argocd \
+            -target=helm_release.nginx_ingress \
+            -target=kubernetes_secret_v1.petclinic_rds \
+            -target=kubernetes_deployment_v1.ingress_healthcheck \
+            -target=kubernetes_service_v1.ingress_healthcheck \
+            -auto-approve
+
+      # --------------------------------------------------
+      # Destroy remaining AWS infrastructure
+      # --------------------------------------------------
+      - name: Destroy Remaining Infrastructure
+        run: |
+          terraform destroy -auto-approve
+
+      # --------------------------------------------------
+      # Verify remaining state
+      # --------------------------------------------------
+      - name: Verify Terraform State
+        run: |
+          terraform state list || true
+          terraform workspace show
+       
 
       # --------------------------------------------------
       # Verify remaining state
