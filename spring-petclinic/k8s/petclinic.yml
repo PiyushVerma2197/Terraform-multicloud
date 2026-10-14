@@ -70,7 +70,7 @@ kind: Service
 metadata:
   name: petclinic
 spec:
-  type: Cluster
+  type: ClusterIP
   selector:
     app: petclinic
   ports:
