@@ -136,7 +136,7 @@ locals {
   }
 
   eks_node_instance_types = {
-    dev   = "t3.small"
+    dev   = "m7i-flex.large"
     stage = "t3.medium"
     prod  = "t3.large"
   }
