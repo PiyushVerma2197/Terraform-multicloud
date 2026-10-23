@@ -196,11 +196,11 @@ module "aws_vpc" {
   eks_node_min_size      = local.eks_node_min_sizes[local.environment]
   eks_node_max_size      = local.eks_node_max_sizes[local.environment]
   eks_node_desired_size  = local.eks_node_desired_sizes[local.environment]
-  rds_database_name      = local.rds_database_names[local.environment]
-  rds_username           = local.rds_usernames[local.environment]
-  # rds_password           = local.rds_password[local.environment]
-  rds_instance_class    = local.rds_instance_classes[local.environment]
-  rds_allocated_storage = local.rds_allocated_storages[local.environment]
+  #rds_database_name      = local.rds_database_names[local.environment]
+  #rds_username           = local.rds_usernames[local.environment]
+  #rds_password           = local.rds_password[local.environment]
+  #rds_instance_class    = local.rds_instance_classes[local.environment]
+  #rds_allocated_storage = local.rds_allocated_storages[local.environment]
   domain_name           = var.route53_domain
   subdomain             = var.petclinic_subdomain
   alb_dns_name          = module.aws_vpc.alb_dns_name
